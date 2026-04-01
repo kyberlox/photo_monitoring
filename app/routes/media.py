@@ -31,7 +31,7 @@ async def enrich_media_with_base64(media: Media) -> MediaSchema:
     )
 
 
-@router.get("/", response_model=list[MediaSchema])
+@router.get("/all", response_model=list[MediaSchema])
 async def get_media(
     location_id: int = Query(None, description="Фильтр по локации"),
     media_type: MediaType = Query(None, description="Фильтр по типу (photo/video/text)"),
@@ -48,7 +48,7 @@ async def get_media(
     return [await enrich_media_with_base64(m) for m in media_list]
 
 
-@router.get("/{media_id}", response_model=MediaSchema)
+@router.get("/id={media_id}", response_model=MediaSchema)
 async def get_media_item(media_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Media).where(Media.id == media_id))
     media = result.scalar_one_or_none()
@@ -57,7 +57,7 @@ async def get_media_item(media_id: int, db: AsyncSession = Depends(get_db)):
     return await enrich_media_with_base64(media)
 
 
-@router.post("/", response_model=MediaSchema)
+@router.post("/add", response_model=MediaSchema)
 async def create_media(media_data: MediaCreate, db: AsyncSession = Depends(get_db)):
     # Проверка существования локации
     result = await db.execute(select(Location).where(Location.id == media_data.location_id))
@@ -104,7 +104,7 @@ async def create_media(media_data: MediaCreate, db: AsyncSession = Depends(get_d
     return await enrich_media_with_base64(new_media)
 
 
-@router.put("/{media_id}", response_model=MediaSchema)
+@router.put("/id={media_id}", response_model=MediaSchema)
 async def update_media(
     media_id: int,
     media_data: MediaUpdate,
@@ -151,7 +151,7 @@ async def update_media(
     return await enrich_media_with_base64(media)
 
 
-@router.delete("/{media_id}")
+@router.delete("/id={media_id}")
 async def delete_media(
     media_id: int,
     db: AsyncSession = Depends(get_db),

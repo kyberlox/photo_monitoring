@@ -10,7 +10,7 @@ from app.schemas.location import LocationCreate, LocationUpdate, Location as Loc
 router = APIRouter(prefix="/locations", tags=["locations"])
 
 
-@router.get("/", response_model=list[LocationSchema])
+@router.get("/all", response_model=list[LocationSchema])
 async def get_locations(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Location)  # убрали selectinload, т.к. media временно не загружаем
@@ -19,7 +19,7 @@ async def get_locations(db: AsyncSession = Depends(get_db)):
     return locations
 
 
-@router.get("/{location_id}", response_model=LocationSchema)
+@router.get("/id={location_id}", response_model=LocationSchema)
 async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Location)
@@ -32,7 +32,7 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
     return location
 
 
-@router.post("/", response_model=LocationSchema)
+@router.post("/add", response_model=LocationSchema)
 async def create_location(
     location_data: LocationCreate, db: AsyncSession = Depends(get_db)
 ):
@@ -43,7 +43,7 @@ async def create_location(
     return new_location
 
 
-@router.put("/{location_id}", response_model=LocationSchema)
+@router.put("/id={location_id}", response_model=LocationSchema)
 async def update_location(
     location_id: int,
     location_data: LocationUpdate,
@@ -63,7 +63,7 @@ async def update_location(
     return location
 
 
-@router.delete("/{location_id}")
+@router.delete("/id={location_id}")
 async def delete_location(
     location_id: int,
     db: AsyncSession = Depends(get_db),
