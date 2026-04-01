@@ -35,6 +35,7 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
     return location
 
 
+
 @router.post("/add", response_model=LocationSchema)
 async def create_location(
     location_data: LocationCreate, db: AsyncSession = Depends(get_db)
