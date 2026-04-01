@@ -20,7 +20,7 @@ class Media(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     file_path = Column(String, nullable=True)  # путь к файлу (для photo/video)
     content = Column(Text, nullable=True)  # текстовое описание или base64 (для text)
-    media_type = Column(Enum(MediaType), nullable=False, default=MediaType.PHOTO)
+    media_type = Column(Enum(MediaType, native_enum=False), nullable=False, default=MediaType.PHOTO)
     comment = Column(Text, nullable=True)  # дополнительный комментарий
     
     # Внешний ключ на локацию
