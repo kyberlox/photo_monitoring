@@ -1,6 +1,6 @@
 import asyncio
 from app.database.database import engine, Base
-from app.models import user, location, image
+from app.models import location, media
 
 
 async def create_tables():

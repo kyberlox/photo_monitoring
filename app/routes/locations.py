@@ -5,7 +5,6 @@ from sqlalchemy.orm import selectinload
 
 from app.database.database import get_db
 from app.models.location import Location
-from app.models.user import User
 from app.schemas.location import LocationCreate, LocationUpdate, Location as LocationSchema
 
 router = APIRouter(prefix="/locations", tags=["locations"])
@@ -14,7 +13,7 @@ router = APIRouter(prefix="/locations", tags=["locations"])
 @router.get("/", response_model=list[LocationSchema])
 async def get_locations(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Location).options(selectinload(Location.images))
+        select(Location).options(selectinload(Location.media))
     )
     locations = result.scalars().all()
     return locations
@@ -25,7 +24,7 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Location)
         .where(Location.id == location_id)
-        .options(selectinload(Location.images))
+        .options(selectinload(Location.media))
     )
     location = result.scalar_one_or_none()
     if location is None:
@@ -68,21 +67,16 @@ async def update_location(
 async def delete_location(
     location_id: int,
     db: AsyncSession = Depends(get_db),
-    # В реальном приложении здесь должна быть проверка is_admin
 ):
     result = await db.execute(
         select(Location)
         .where(Location.id == location_id)
-        .options(selectinload(Location.images))
+        .options(selectinload(Location.media))
     )
     location = result.scalar_one_or_none()
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
     
-    # Проверка прав администратора (заглушка)
-    # if not current_user.is_admin:
-    #     raise HTTPException(status_code=403, detail="Только администратор может удалять локации")
-    
     await db.delete(location)
     await db.commit()
-    return {"message": "Локация и все связанные изображения удалены"}
+    return {"message": "Локация и все связанные медиа удалены"}

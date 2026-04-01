@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import users, locations, images
+from app.routes import locations, media
 
 app = FastAPI(
-    title="Photo Monitoring API",
-    description="API для мониторинга фотографий по локациям",
-    version="1.0.0",
+    title="Virtual Map API",
+    description="API для виртуальной карты с поддержкой фото, видео и текстовых описаний",
+    version="2.0.0",
 )
 
 # Настройка CORS
@@ -19,14 +19,13 @@ app.add_middleware(
 )
 
 # Подключение роутеров
-app.include_router(users.router)
 app.include_router(locations.router)
-app.include_router(images.router)
+app.include_router(media.router)
 
 
 @app.get("/")
 async def root():
-    return {"message": "Photo Monitoring API работает"}
+    return {"message": "Virtual Map API работает"}
 
 
 @app.get("/health")

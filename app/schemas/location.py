@@ -1,12 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
-from app.schemas.image import Image
+from app.schemas.media import Media
 
 
 class LocationBase(BaseModel):
     name: Optional[str] = None
-    coord_x: float
-    coord_y: float
+    coordinates: List[float] = Field(..., min_items=2, max_items=2, description="Координаты [x, y]")
 
 
 class LocationCreate(LocationBase):
@@ -15,13 +14,12 @@ class LocationCreate(LocationBase):
 
 class LocationUpdate(BaseModel):
     name: Optional[str] = None
-    coord_x: Optional[float] = None
-    coord_y: Optional[float] = None
+    coordinates: Optional[List[float]] = Field(None, min_items=2, max_items=2, description="Координаты [x, y]")
 
 
 class Location(LocationBase):
     id: int
-    images: List[Image] = []
+    media: List[Media] = []
 
     class Config:
         from_attributes = True

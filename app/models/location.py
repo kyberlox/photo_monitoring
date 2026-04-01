@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, ARRAY, Float
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -9,8 +9,7 @@ class Location(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=True)  # необязательное
-    coord_x = Column(Float, nullable=False)
-    coord_y = Column(Float, nullable=False)
+    coordinates = Column(ARRAY(Float), nullable=False)  # [x, y]
 
-    # Связь с изображениями
-    images = relationship("Image", back_populates="location", cascade="all, delete-orphan")
+    # Связь с медиа (фото, видео, текст)
+    media = relationship("Media", back_populates="location", cascade="all, delete-orphan")
