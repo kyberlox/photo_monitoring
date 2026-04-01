@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.database.database import engine, Base
 from app.routes import locations, media
 
 app = FastAPI(
@@ -21,6 +22,14 @@ app.add_middleware(
 # Подключение роутеров
 app.include_router(locations.router)
 app.include_router(media.router)
+
+
+@app.on_event("startup")
+async def create_tables():
+    """Автоматическое создание таблиц при запуске приложения."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    print("✅ Таблицы базы данных созданы/проверены")
 
 
 @app.get("/")

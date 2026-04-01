@@ -13,7 +13,7 @@ router = APIRouter(prefix="/locations", tags=["locations"])
 @router.get("/", response_model=list[LocationSchema])
 async def get_locations(db: AsyncSession = Depends(get_db)):
     result = await db.execute(
-        select(Location).options(selectinload(Location.media))
+        select(Location)  # убрали selectinload, т.к. media временно не загружаем
     )
     locations = result.scalars().all()
     return locations
@@ -24,7 +24,7 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Location)
         .where(Location.id == location_id)
-        .options(selectinload(Location.media))
+        # убрали selectinload, т.к. media временно не загружаем
     )
     location = result.scalar_one_or_none()
     if location is None:

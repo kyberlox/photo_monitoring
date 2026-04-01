@@ -19,7 +19,7 @@ class LocationUpdate(BaseModel):
 
 class Location(LocationBase):
     id: int
-    media: List[Media] = []
+    # media: List[Media] = []  # временно отключено из-за проблем с асинхронной загрузкой
 
     class Config:
         from_attributes = True

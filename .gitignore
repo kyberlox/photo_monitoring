@@ -3,3 +3,5 @@
 /pSQL
 
 /app/uploads
+
+**/__pycache__/
