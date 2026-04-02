@@ -1,12 +1,11 @@
 from .location import Location, LocationCreate, LocationUpdate
-from .media import Media, MediaCreate, MediaUpdate, MediaType
+from .photo import Photo, PhotoCreate, PhotoUpdate
 
 __all__ = [
     "Location",
     "LocationCreate",
     "LocationUpdate",
-    "Media",
-    "MediaCreate",
-    "MediaUpdate",
-    "MediaType",
+    "Photo",
+    "PhotoCreate",
+    "PhotoUpdate",
 ]

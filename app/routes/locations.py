@@ -6,7 +6,7 @@ from typing import List
 
 from app.database.database import get_db
 from app.models.location import Location
-from app.models.media import Media, MediaType
+from app.models.photo import Photo
 from app.schemas.location import LocationCreate, LocationUpdate, Location as LocationSchema
 from app.utils.file_storage import save_base64_as_file
 
@@ -40,46 +40,39 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
 async def create_location(
     location_data: LocationCreate, db: AsyncSession = Depends(get_db)
 ):
-    # Извлекаем медиафайлы из запроса (если есть)
-    media_list = location_data.media
-    # Удаляем поле media из данных локации, т.к. в модели Location его нет
-    location_dict = location_data.model_dump(exclude={"media"})
+    # Извлекаем фото из запроса (если есть)
+    photos_list = location_data.photos
+    # Удаляем поле photos из данных локации, т.к. в модели Location его нет
+    location_dict = location_data.model_dump(exclude={"photos"})
     
     new_location = Location(**location_dict)
     db.add(new_location)
     await db.commit()
     await db.refresh(new_location)
     
-    # Если есть медиафайлы, создаём их
-    if media_list:
-        for media_item in media_list:
+    # Если есть фото, создаём их
+    if photos_list:
+        for photo_item in photos_list:
             file_path = None
-            content = None
             
-            # Обработка base64 данных для фото/видео
-            if media_item.base64_data and media_item.media_type in (MediaType.PHOTO, MediaType.VIDEO):
+            # Обработка base64 данных для фото
+            if photo_item.base64_data:
                 file_path = save_base64_as_file(
-                    base64_data=media_item.base64_data,
+                    base64_data=photo_item.base64_data,
                     filename=None  # автоматически сгенерирует имя
                 )
             
-            # Для текстового типа сохраняем content
-            if media_item.media_type == MediaType.TEXT:
-                content = media_item.content
-            
-            # Создаём объект Media
-            new_media = Media(
-                title=media_item.title,
-                comment=media_item.comment,
-                media_type=media_item.media_type,
+            # Создаём объект Photo
+            new_photo = Photo(
+                title=photo_item.title,
+                comment=photo_item.comment,
                 file_path=file_path,
-                content=content,
                 location_id=new_location.id
             )
-            db.add(new_media)
+            db.add(new_photo)
         
         await db.commit()
-        # Обновляем локацию, чтобы связанные медиа были загружены (опционально)
+        # Обновляем локацию, чтобы связанные фото были загружены (опционально)
         await db.refresh(new_location)
     
     return new_location
@@ -113,7 +106,7 @@ async def delete_location(
     result = await db.execute(
         select(Location)
         .where(Location.id == location_id)
-        .options(selectinload(Location.media))
+        .options(selectinload(Location.photos))
     )
     location = result.scalar_one_or_none()
     if location is None:
@@ -121,4 +114,4 @@ async def delete_location(
     
     await db.delete(location)
     await db.commit()
-    return {"message": "Локация и все связанные медиа удалены"}
+    return {"message": "Локация и все связанные фото удалены"}

@@ -11,5 +11,5 @@ class Location(Base):
     name = Column(String, nullable=True)  # необязательное
     coordinates = Column(ARRAY(Float), nullable=False)  # [x, y]
 
-    # Связь с медиа (фото, видео, текст)
-    media = relationship("Media", back_populates="location", cascade="all, delete-orphan")
+    # Связь с фото
+    photos = relationship("Photo", back_populates="location", cascade="all, delete-orphan")

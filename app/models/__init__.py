@@ -1,4 +1,4 @@
 from .location import Location
-from .media import Media
+from .photo import Photo
 
-__all__ = ["Location", "Media"]
+__all__ = ["Location", "Photo"]

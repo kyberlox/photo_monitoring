@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database.database import engine, Base
-from app.routes import locations, media
+from app.routes import locations, photos
 
 app = FastAPI(
     title="Virtual Map API",
-    description="API для виртуальной карты с поддержкой фото, видео и текстовых описаний",
+    description="API для виртуальной карты с поддержкой фотографий по локациям",
     version="2.0.0",
 )
 
@@ -21,7 +21,7 @@ app.add_middleware(
 
 # Подключение роутеров
 app.include_router(locations.router)
-app.include_router(media.router)
+app.include_router(photos.router)
 
 
 @app.on_event("startup")
