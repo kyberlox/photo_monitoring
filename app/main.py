@@ -27,9 +27,22 @@ app.include_router(photos.router)
 @app.on_event("startup")
 async def create_tables():
     """Автоматическое создание таблиц при запуске приложения."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    print("✅ Таблицы базы данных созданы/проверены")
+    import asyncio
+    max_attempts = 5
+    for attempt in range(1, max_attempts + 1):
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            print("✅ Таблицы базы данных созданы/проверены")
+            break
+        except Exception as e:
+            print(f"❌ Попытка {attempt}/{max_attempts} не удалась: {e}")
+            if attempt == max_attempts:
+                print("⚠️  Не удалось создать таблицы. Продолжаем работу, возможно таблицы уже существуют.")
+                import traceback
+                traceback.print_exc()
+            else:
+                await asyncio.sleep(2 ** attempt)  # экспоненциальная задержка
 
 
 @app.get("/")

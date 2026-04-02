@@ -1,4 +1,5 @@
 import base64
+import binascii
 import os
 import uuid
 import mimetypes
@@ -60,7 +61,10 @@ def save_base64_as_file(base64_data: str, filename: Optional[str] = None) -> str
         data = base64_data
     
     # Декодируем
-    file_data = base64.b64decode(data)
+    try:
+        file_data = base64.b64decode(data, validate=True)
+    except (binascii.Error, ValueError) as e:
+        raise ValueError(f"Некорректные base64 данные: {e}")
     
     # Определяем тип и расширение
     media_type, extension = detect_media_type_from_base64(base64_data)

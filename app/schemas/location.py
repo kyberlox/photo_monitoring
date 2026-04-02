@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from app.schemas.photo import Photo
 
 
 class LocationBase(BaseModel):
@@ -27,7 +28,7 @@ class LocationUpdate(BaseModel):
 
 class Location(LocationBase):
     id: int
-    # photos: List[Photo] = []  # временно отключено из-за проблем с асинхронной загрузкой
+    photos: List[Photo] = []
 
     class Config:
         from_attributes = True

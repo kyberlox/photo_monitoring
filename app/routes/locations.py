@@ -15,23 +15,41 @@ router = APIRouter(prefix="/locations", tags=["locations"])
 
 @router.get("/all", response_model=list[LocationSchema])
 async def get_locations(db: AsyncSession = Depends(get_db)):
+    from app.routes.photos import enrich_photo_with_base64
     result = await db.execute(
-        select(Location)  # убрали selectinload, т.к. media временно не загружаем
+        select(Location).options(selectinload(Location.photos))
     )
     locations = result.scalars().all()
-    return locations
+    # Обогащаем фото каждой локации base64
+    enriched_locations = []
+    for loc in locations:
+        # Создаем копию локации (но это не нужно, т.к. мы меняем только photos)
+        # Преобразуем каждое фото
+        enriched_photos = []
+        for photo in loc.photos:
+            enriched_photos.append(await enrich_photo_with_base64(photo))
+        # Заменяем photos на обогащённые
+        loc.photos = enriched_photos
+        enriched_locations.append(loc)
+    return enriched_locations
 
 
 @router.get("/id={location_id}", response_model=LocationSchema)
 async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
+    from app.routes.photos import enrich_photo_with_base64
     result = await db.execute(
         select(Location)
         .where(Location.id == location_id)
-        # убрали selectinload, т.к. media временно не загружаем
+        .options(selectinload(Location.photos))
     )
     location = result.scalar_one_or_none()
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
+    # Обогащаем фото base64
+    enriched_photos = []
+    for photo in location.photos:
+        enriched_photos.append(await enrich_photo_with_base64(photo))
+    location.photos = enriched_photos
     return location
 
 
@@ -72,8 +90,20 @@ async def create_location(
             db.add(new_photo)
         
         await db.commit()
-        # Обновляем локацию, чтобы связанные фото были загружены (опционально)
-        await db.refresh(new_location)
+    
+    # Перезагружаем локацию с фото
+    from app.routes.photos import enrich_photo_with_base64
+    result = await db.execute(
+        select(Location)
+        .where(Location.id == new_location.id)
+        .options(selectinload(Location.photos))
+    )
+    new_location = result.scalar_one()
+    # Обогащаем фото base64
+    enriched_photos = []
+    for photo in new_location.photos:
+        enriched_photos.append(await enrich_photo_with_base64(photo))
+    new_location.photos = enriched_photos
     
     return new_location
 
@@ -84,7 +114,12 @@ async def update_location(
     location_data: LocationUpdate,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(Location).where(Location.id == location_id))
+    from app.routes.photos import enrich_photo_with_base64
+    result = await db.execute(
+        select(Location)
+        .where(Location.id == location_id)
+        .options(selectinload(Location.photos))
+    )
     location = result.scalar_one_or_none()
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
@@ -94,7 +129,18 @@ async def update_location(
         setattr(location, field, value)
     
     await db.commit()
-    await db.refresh(location)
+    # Перезагружаем локацию с фото
+    result = await db.execute(
+        select(Location)
+        .where(Location.id == location_id)
+        .options(selectinload(Location.photos))
+    )
+    location = result.scalar_one()
+    # Обогащаем фото base64
+    enriched_photos = []
+    for photo in location.photos:
+        enriched_photos.append(await enrich_photo_with_base64(photo))
+    location.photos = enriched_photos
     return location
 
 
