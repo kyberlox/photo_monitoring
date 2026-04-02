@@ -20,17 +20,19 @@ async def get_locations(db: AsyncSession = Depends(get_db)):
         select(Location).options(selectinload(Location.photos))
     )
     locations = result.scalars().all()
-    # Обогащаем фото каждой локации base64
+    
     enriched_locations = []
     for loc in locations:
-        # Создаем копию локации (но это не нужно, т.к. мы меняем только photos)
-        # Преобразуем каждое фото
+        # Создаём объект схемы из модели локации
+        loc_schema = LocationSchema.model_validate(loc, from_attributes=True)
+        # Обогащаем фото base64
         enriched_photos = []
         for photo in loc.photos:
             enriched_photos.append(await enrich_photo_with_base64(photo))
-        # Заменяем photos на обогащённые
-        loc.photos = enriched_photos
-        enriched_locations.append(loc)
+        # Заменяем photos в схеме
+        loc_schema.photos = enriched_photos
+        enriched_locations.append(loc_schema)
+    
     return enriched_locations
 
 
