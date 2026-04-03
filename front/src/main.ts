@@ -9,7 +9,7 @@ const app = createApp(App)
 app
 .use(createPinia())
 .use(createYmaps({
-  apikey: '3f8f0af1-723b-47db-b868-be798083bba6',
+  apikey: '44cd4d19-a17e-41a7-8855-f2e0cddba206',
 }));
 
 app.mount('#app')
