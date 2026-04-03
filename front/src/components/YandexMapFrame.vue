@@ -12,7 +12,7 @@
     <YandexMapDefaultFeaturesLayer />
     <YandexMapDefaultMarker v-for="point in allPoints"
                             :id=point.id
-                            :settings="{ coordinates: point.coordinates as LngLat, onClick: () => $emit('markerClicked', point), }">
+                            :settings="{ coordinates: point.coordinates as LngLat, onClick: () => $emit('markerClicked', point) }">
     </YandexMapDefaultMarker>
     <YandexMapDefaultMarker v-if="newPoint && newPoint.coordinates"
                             :id=newPoint.id
@@ -23,7 +23,7 @@
 </YandexMap>
 </template>
 <script lang='ts'>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { shallowRef } from 'vue';
 import type { LngLat, YMap } from '@yandex/ymaps3-types';
 import {
@@ -51,9 +51,14 @@ export default defineComponent({
         }
     },
     emits: ['markerClicked', 'mapClicked'],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
         const map = shallowRef<null | YMap>(null);
         const newPoint = ref<IMapMarker>({ coordinates: null });
+
+        watch((props), () => {
+            if (props.pageType)
+                newPoint.value = ({ coordinates: null });
+        }, { deep: true })
 
         const onMapClick: DomEventHandler = (object, event) => {
             newPoint.value.coordinates = event.coordinates;

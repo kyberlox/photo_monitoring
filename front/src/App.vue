@@ -10,6 +10,8 @@
                  :allPoints=mapPoints
                  :newCoordinates="newCoordinates"
                  :pageType="pageType"
+                 @markerClicked="markerClicked"
+                 @deletePoint="deletePoint"
                  @addNewPoint="addNewPoint" />
 </div>
 </template>
@@ -59,6 +61,12 @@ export default defineComponent({
         .finally(() => getPoints())
     }
 
+    const deletePoint = (id: number) => {
+      Api.delete(`/locations/id=${id}`)
+        .then(data => console.log(data))
+        .finally(() => getPoints())
+    }
+
     onMounted(() => {
       getPoints();
     })
@@ -73,6 +81,7 @@ export default defineComponent({
       pageTypeChanged,
       markerClicked,
       getPoints,
+      deletePoint,
       mapPoints: computed(() => useMapInfo.getPoints)
     }
   }

@@ -6,7 +6,6 @@
      @click="{ activeImage = 'src/assets/img/test.jpg'; visibleModal = true }">
     <img class="object-cover rounded-sm w-full h-full mt-2  cursor-pointer hover:scale-101 transition duration-200"
          :src="image.file_url" />
-
 </div>
 <SlotModal v-if="activeImage && visibleModal"
            @close="visibleModal = false">

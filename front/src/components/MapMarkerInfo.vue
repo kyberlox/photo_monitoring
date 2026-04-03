@@ -4,17 +4,20 @@
         <div v-if="(pageType == 'watch' ? !activeMarker : !newCoordinates?.length)">
             <div class="text-lg mt-5">Нажмите на точку на карте или выберите точку из списка</div>
             <div v-for="point in allPoints"
-                 class="flex flex-row justify-between"
-                 :key="allPoints?.length"
-                 @click="$emit('changeActiveMarker', point)">
-                <span>
+                 class="flex flex-row justify-between px-4"
+                 :key="allPoints?.length">
+                <div class="text-md text-blue-600 underline cursor-pointer hover:text-blue-400 duration-200"
+                     @click="$emit('markerClicked', point)">
                     {{ point.name }}
-                </span>
-                <span сlass="text-sm underline text-red cursor-pointer">Удалить</span>
+                </div>
+                <div class="text-sm text-red-600 underline cursor-pointer hover:text-red-400 duration-200"
+                     @click="$emit('deletePoint', point.id)">
+                    Удалить
+                </div>
             </div>
         </div>
         <div v-if="activeMarker && pageType == 'watch'"
-             class="flex flex-col items-start gap-4 max-h-full overflow-y-scroll">
+             class="flex flex-col items-start gap-4 max-h-full overflow-y-auto">
             <MapMarkerInfoWatch :activeMarker="activeMarker" />
         </div>
         <div v-if="newCoordinates?.length && pageType == 'edit'"
@@ -33,7 +36,7 @@ import type { IMapMarker } from '@/interfaces/IMapMarkers';
 
 export default defineComponent({
     components: { MapMarkerInfoWatch, MapMarkerInfoEdit },
-    emits: ['addNewPoint', 'changeActiveMarker'],
+    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked'],
     props: {
         activeMarker: {
             type: Object as PropType<IMapMarker>
@@ -48,12 +51,5 @@ export default defineComponent({
             type: Array<IMapMarker>
         }
     },
-    setup() {
-
-
-        return {
-
-        }
-    }
 });
 </script>
