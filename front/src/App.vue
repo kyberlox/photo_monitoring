@@ -47,6 +47,7 @@ export default defineComponent({
     }
     const pageTypeChanged = (type: string) => {
       pageType.value = type
+      newCoordinates.value = []
     }
     const mapClicked = (e: YandexMapDefaultMarkerSettings) => {
       (newCoordinates.value as LngLat) = e.coordinates;
