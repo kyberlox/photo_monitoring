@@ -54,7 +54,7 @@ async def get_photo(photo_id: int, db: AsyncSession = Depends(get_db)):
 @router.post("/add", response_model=PhotoSchema)
 async def create_photo(
     title: str = Form(...),
-    comment: str = Form(None),
+    comment: Optional[str] = Form(None),
     location_id: int = Form(...),
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
@@ -85,8 +85,8 @@ async def create_photo(
 @router.put("/id={photo_id}", response_model=PhotoSchema)
 async def update_photo(
     photo_id: int,
-    title: str = Form(None),
-    comment: str = Form(None),
+    title: Optional[str] = Form(None),
+    comment: Optional[str] = Form(None),
     file: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
 ):
