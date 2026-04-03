@@ -88,3 +88,44 @@ def file_exists(file_path: str) -> bool:
     Проверяет, существует ли файл.
     """
     return os.path.exists(file_path)
+
+
+def extract_filepath_from_url(url: str) -> Optional[str]:
+    """
+    Извлекает путь к файлу на диске из URL статики.
+    
+    Примеры:
+    - "/static/photos/abc123.jpg" -> "/uploads/photos/abc123.jpg"
+    - "http://localhost:8000/static/photos/abc123.jpg" -> "/uploads/photos/abc123.jpg"
+    """
+    # Убираем протокол и домен, если есть
+    if "://" in url:
+        # Извлекаем путь после домена
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        url_path = parsed.path
+    else:
+        url_path = url
+    
+    # Убираем префикс /static/
+    if url_path.startswith("/static/"):
+        url_path = url_path[len("/static/"):]
+    
+    if not url_path:
+        return None
+    
+    # Собираем полный путь
+    file_path = UPLOAD_BASE / url_path
+    return str(file_path)
+
+
+def delete_file_by_url(url: str) -> bool:
+    """
+    Удаляет файл по его URL (статическому).
+    Возвращает True, если файл удалён, False если файл не найден.
+    """
+    file_path = extract_filepath_from_url(url)
+    if not file_path:
+        return False
+    
+    return delete_file(file_path)

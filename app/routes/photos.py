@@ -8,9 +8,15 @@ from app.database.database import get_db
 from app.models.photo import Photo
 from app.models.location import Location
 from app.schemas.photo import PhotoCreate, PhotoUpdate, Photo as PhotoSchema
-from app.utils.file_storage import save_upload_file, generate_file_url, delete_file
+from app.utils.file_storage import (
+    save_upload_file,
+    generate_file_url,
+    delete_file,
+    delete_file_by_url,
+    extract_filepath_from_url
+)
 
-router = APIRouter(prefix="/photos", tags=["photos"])
+router = APIRouter(prefix="/api/photos", tags=["photos"])
 
 
 async def enrich_photo_with_url(photo: Photo) -> PhotoSchema:
@@ -137,3 +143,44 @@ async def delete_photo(
     await db.delete(photo)
     await db.commit()
     return {"message": "Фото удалено"}
+
+
+@router.delete("/by-url")
+async def delete_photo_by_url(
+    url: str = Query(..., description="URL фото для удаления (например, /static/photos/filename.jpg)"),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Удаляет фото по его URL.
+    
+    URL может быть полным (http://localhost:8000/static/photos/...)
+    или относительным (/static/photos/...).
+    """
+    # Извлекаем путь к файлу из URL
+    file_path = extract_filepath_from_url(url)
+    if not file_path:
+        raise HTTPException(
+            status_code=400,
+            detail="Некорректный URL. Ожидается URL вида /static/photos/..."
+        )
+    
+    # Проверяем, существует ли файл
+    import os
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Файл не найден")
+    
+    # Ищем запись в БД по file_path
+    result = await db.execute(select(Photo).where(Photo.file_path == file_path))
+    photo = result.scalar_one_or_none()
+    
+    # Удаляем файл с диска
+    delete_file(file_path)
+    
+    # Если есть запись в БД, удаляем и её
+    if photo:
+        await db.delete(photo)
+        await db.commit()
+        return {"message": "Фото удалено (файл и запись в БД)"}
+    else:
+        await db.commit()  # коммит для завершения транзакции
+        return {"message": "Файл удалён (запись в БД не найдена)"}
