@@ -17,7 +17,7 @@ export default class Api {
         })
     }
 
-    static async post(url: string, data?: IMapMarker) {
+    static async post(url: string, data?: IMapMarker | FormData) {
       return api.post(url, data)
        .then(resp=> resp.data)
         .catch(e=>{

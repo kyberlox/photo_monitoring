@@ -68,11 +68,14 @@ export default defineComponent({
     }
 
     const updatePhoto = (data: FormData) => {
+      if (!activeMarker.value?.id) return
+      const id = activeMarker.value.id;
       const updateBody = new FormData();
       const updatedPhotos = data.getAll('photos');
-
+      updateBody.append('location_id', String(id));
       updatedPhotos.forEach(e => updateBody.append('photos', e))
-      Api.put(`photos/id=${activeMarker.value?.id}`, updateBody)
+      Api.post(`photos/add`, updateBody)
+        .then(() => getPoints())
     }
 
     onMounted(() => {
