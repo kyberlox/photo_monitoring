@@ -50,19 +50,21 @@ services:
     networks:
       - app-network
   
-  # frontend:
-  #   container_name: vue_async
-  #   build: ./front
-  #   volumes:
-  #     #- ./front/:/app/
-  #     - ./app_logs/frontend:/app/logs  # Логи фронтенда
-  #   ports:
-  #     #- "127.0.0.1:5173:5173"
-  #     - "5173:5173"
-  #   depends_on:
-  #     - fastapi
-  #   networks:
-  #     - app-network
+  frontend:
+    container_name: vue_async
+    build: ./front
+    volumes:
+      #- ./front/:/app/
+      - ./app_logs/frontend:/app/logs  # Логи фронтенда
+    ports:
+      #- "127.0.0.1:5173:5173"
+      - "5173:5173"
+    depends_on:
+      - fastapi
+    environment:
+      - VITE_API_URL=${HOST}
+    networks:
+      - app-network
 
 
 
