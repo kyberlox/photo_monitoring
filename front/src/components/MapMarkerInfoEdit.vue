@@ -1,4 +1,5 @@
 <template>
+<div class="text-lg mt-5">Укажите точку на карте</div>
 <div class="flex flex-col gap-4 w-full mt-4">
     <input class="rounded-md border border-gray-400 px-2 py-1 outline-none w-fit"
            v-model="name"

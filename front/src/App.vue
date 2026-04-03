@@ -41,6 +41,7 @@ export default defineComponent({
     const newCoordinates = ref<number[]>([]);
 
     const markerClicked = (newVal: IMapMarker) => {
+      pageType.value = 'watch';
       activeMarker.value = newVal;
     }
     const pageTypeChanged = (type: string) => {

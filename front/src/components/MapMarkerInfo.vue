@@ -1,28 +1,20 @@
 <template>
 <div class="w-full h-full max-w-[650px] bg-gray-100 p-2">
     <div class="rounded-lg bg-white h-full w-full flex flex-col px-3">
-        <div v-if="(pageType == 'watch' ? !activeMarker : !newCoordinates?.length)">
-            <div class="text-lg mt-5">Нажмите на точку на карте или выберите точку из списка</div>
-            <div v-for="point in allPoints"
-                 class="flex flex-row justify-between px-4"
-                 :key="allPoints?.length">
-                <div class="text-md text-blue-600 underline cursor-pointer hover:text-blue-400 duration-200"
-                     @click="$emit('markerClicked', point)">
-                    {{ point.name }}
-                </div>
-                <div class="text-sm text-red-600 underline cursor-pointer hover:text-red-400 duration-200"
-                     @click="$emit('deletePoint', point.id)">
-                    Удалить
-                </div>
-            </div>
+        <div v-if="pageType == 'list'"
+             class="flex flex-col items-start gap-4 max-h-full overflow-y-auto">
+            <MapMarkerInfoList :activeMarker="activeMarker"
+                               :allPoints="allPoints"
+                               @markerClicked="(id) => $emit('markerClicked', id)"
+                               @deletePoint="(id) => $emit('deletePoint', id)" />
         </div>
-        <div v-if="activeMarker && pageType == 'watch'"
+        <div v-else-if="pageType == 'watch'"
              class="flex flex-col items-start gap-4 max-h-full overflow-y-auto">
             <MapMarkerInfoWatch :activeMarker="activeMarker" />
         </div>
-        <div v-if="newCoordinates?.length && pageType == 'edit'"
+        <div v-else-if="pageType == 'edit'"
              class="flex flex-col items-start gap-4 max-h-full ">
-            <MapMarkerInfoEdit :coordinates="newCoordinates"
+            <MapMarkerInfoEdit :coordinates="newCoordinates || []"
                                @addNewPoint="(newData) => $emit('addNewPoint', newData)" />
         </div>
     </div>
@@ -31,11 +23,12 @@
 <script lang='ts'>
 import { defineComponent, ref, type PropType } from 'vue';
 import MapMarkerInfoWatch from './MapMarkerInfoWatch.vue';
+import MapMarkerInfoList from './MapMarkerInfoList.vue';
 import MapMarkerInfoEdit from './MapMarkerInfoEdit.vue';
 import type { IMapMarker } from '@/interfaces/IMapMarkers';
 
 export default defineComponent({
-    components: { MapMarkerInfoWatch, MapMarkerInfoEdit },
+    components: { MapMarkerInfoWatch, MapMarkerInfoEdit, MapMarkerInfoList },
     emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked'],
     props: {
         activeMarker: {

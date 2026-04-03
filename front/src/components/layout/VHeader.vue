@@ -29,7 +29,7 @@ export default defineComponent({
     },
     setup() {
         return {
-            pageTypes: [{ title: 'Просмотр', name: 'watch' }, { title: 'Добавить точку', 'name': 'edit' }]
+            pageTypes: [{ title: 'Все точки', 'name': 'list' }, { title: 'Просмотр', name: 'watch' }, { title: 'Добавить точку', 'name': 'edit' }]
         }
     }
 });
