@@ -26,7 +26,7 @@ export default class Api {
 }
     static async put(
         url: string,
-        data?: string
+        data?: FormData
     ) {
         return (await api.put(url, data))
     }

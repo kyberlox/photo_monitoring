@@ -70,7 +70,6 @@ export default defineComponent({
     const updatePhoto = (data: FormData) => {
       const updateBody = new FormData();
       const updatedPhotos = data.getAll('photos');
-      console.log(updatedPhotos);
 
       updatedPhotos.forEach(e => updateBody.append('photos', e))
       Api.put(`photos/id=${activeMarker.value?.id}`, updateBody)
