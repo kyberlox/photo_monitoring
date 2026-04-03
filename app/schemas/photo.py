@@ -4,7 +4,6 @@ from datetime import datetime
 
 
 class PhotoBase(BaseModel):
-    title: str
     comment: Optional[str] = None
     # media_type удалён, т.к. только фото
 
@@ -15,7 +14,6 @@ class PhotoCreate(PhotoBase):
 
 
 class PhotoUpdate(BaseModel):
-    title: Optional[str] = None
     comment: Optional[str] = None
     # file будет передаваться как UploadFile в form-data, не как поле схемы
 

@@ -1,3 +1,4 @@
+from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query, Form, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -20,7 +21,6 @@ async def enrich_photo_with_url(photo: Photo) -> PhotoSchema:
     
     return PhotoSchema(
         id=photo.id,
-        title=photo.title,
         comment=photo.comment,
         created_at=photo.created_at,
         file_url=file_url,
@@ -51,12 +51,11 @@ async def get_photo(photo_id: int, db: AsyncSession = Depends(get_db)):
     return await enrich_photo_with_url(photo)
 
 
-@router.post("/add", response_model=PhotoSchema)
+@router.post("/add", response_model=list[PhotoSchema])
 async def create_photo(
-    title: str = Form(...),
     comment: Optional[str] = Form(None),
     location_id: int = Form(...),
-    file: UploadFile = File(...),
+    photos: List[UploadFile] = File(...),
     db: AsyncSession = Depends(get_db),
 ):
     # Проверка существования локации
@@ -65,57 +64,60 @@ async def create_photo(
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
     
-    # Сохраняем файл на диск
-    file_path = save_upload_file(file)
+    created_photos = []
+    for photo_file in photos:
+        if not photo_file.filename:
+            continue  # пропускаем пустые файлы
+        # Сохраняем файл на диск
+        file_path = save_upload_file(photo_file)
+        
+        # Создаем запись в БД
+        new_photo = Photo(
+            comment=comment,
+            file_path=file_path,
+            location_id=location_id,
+        )
+        db.add(new_photo)
+        created_photos.append(new_photo)
     
-    # Создаем запись в БД
-    new_photo = Photo(
-        title=title,
-        comment=comment,
-        file_path=file_path,
-        location_id=location_id,
-    )
-    db.add(new_photo)
     await db.commit()
-    await db.refresh(new_photo)
     
-    return await enrich_photo_with_url(new_photo)
+    # Обогащаем каждое фото URL
+    enriched = []
+    for photo in created_photos:
+        await db.refresh(photo)
+        enriched.append(await enrich_photo_with_url(photo))
+    
+    return enriched
 
 
 @router.put("/id={photo_id}", response_model=PhotoSchema)
 async def update_photo(
     photo_id: int,
-    title: Optional[str] = Form(None),
     comment: Optional[str] = Form(None),
-    file: UploadFile = File(None),
+    photo: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(select(Photo).where(Photo.id == photo_id))
-    photo = result.scalar_one_or_none()
-    if photo is None:
+    photo_obj = result.scalar_one_or_none()
+    if photo_obj is None:
         raise HTTPException(status_code=404, detail="Фото не найдено")
     
-    update_data = {}
-    if title is not None:
-        update_data["title"] = title
     if comment is not None:
-        update_data["comment"] = comment
+        photo_obj.comment = comment
     
     # Если пришел новый файл
-    if file is not None and file.filename:
+    if photo is not None and photo.filename:
         # Удаляем старый файл
-        if photo.file_path:
-            delete_file(photo.file_path)
+        if photo_obj.file_path:
+            delete_file(photo_obj.file_path)
         # Сохраняем новый
-        new_file_path = save_upload_file(file)
-        photo.file_path = new_file_path
-    
-    for field, value in update_data.items():
-        setattr(photo, field, value)
+        new_file_path = save_upload_file(photo)
+        photo_obj.file_path = new_file_path
     
     await db.commit()
-    await db.refresh(photo)
-    return await enrich_photo_with_url(photo)
+    await db.refresh(photo_obj)
+    return await enrich_photo_with_url(photo_obj)
 
 
 @router.delete("/id={photo_id}")
