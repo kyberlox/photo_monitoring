@@ -10,7 +10,8 @@
         </div>
         <div v-else-if="pageType == 'watch'"
              class="flex flex-col items-start gap-4 max-h-full overflow-y-auto">
-            <MapMarkerInfoWatch :activeMarker="activeMarker" />
+            <MapMarkerInfoWatch :activeMarker="activeMarker"
+                                @updatePhoto="(data) => $emit('updatePhoto', data)" />
         </div>
         <div v-else-if="pageType == 'edit'"
              class="flex flex-col items-start gap-4 max-h-full ">
@@ -29,7 +30,7 @@ import type { IMapMarker } from '@/interfaces/IMapMarkers';
 
 export default defineComponent({
     components: { MapMarkerInfoWatch, MapMarkerInfoEdit, MapMarkerInfoList },
-    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked'],
+    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked', 'updatePhoto'],
     props: {
         activeMarker: {
             type: Object as PropType<IMapMarker>

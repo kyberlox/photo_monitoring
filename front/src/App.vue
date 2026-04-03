@@ -12,7 +12,8 @@
                  :pageType="pageType"
                  @markerClicked="markerClicked"
                  @deletePoint="deletePoint"
-                 @addNewPoint="addNewPoint" />
+                 @addNewPoint="addNewPoint"
+                 @updatePhoto="updatePhoto" />
 </div>
 </template>
 <script lang='ts'>
@@ -58,14 +59,21 @@ export default defineComponent({
 
     const addNewPoint = (newData: IMapMarker) => {
       Api.post('/locations/add', newData)
-        .then((data) => console.log(data))
         .finally(() => getPoints())
     }
 
     const deletePoint = (id: number) => {
       Api.delete(`/locations/id=${id}`)
-        .then(data => console.log(data))
         .finally(() => getPoints())
+    }
+
+    const updatePhoto = (data: FormData) => {
+      const updateBody = new FormData();
+      const updatedPhotos = data.getAll('photos');
+      console.log(updatedPhotos);
+
+      updatedPhotos.forEach(e => updateBody.append('photos', e))
+      Api.put(`photos/id=${activeMarker.value?.id}`, updateBody)
     }
 
     onMounted(() => {
@@ -83,6 +91,7 @@ export default defineComponent({
       markerClicked,
       getPoints,
       deletePoint,
+      updatePhoto,
       mapPoints: computed(() => useMapInfo.getPoints)
     }
   }
