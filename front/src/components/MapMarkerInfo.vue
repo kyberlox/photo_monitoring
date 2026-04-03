@@ -11,6 +11,7 @@
         <div v-else-if="pageType == 'watch'"
              class="flex flex-col items-start gap-4 max-h-full overflow-y-auto">
             <MapMarkerInfoWatch :activeMarker="activeMarker"
+                                @deletePhoto="(data) => $emit('deletePhoto', data)"
                                 @updatePhoto="(data) => $emit('updatePhoto', data)" />
         </div>
         <div v-else-if="pageType == 'edit'"
@@ -22,7 +23,7 @@
 </div>
 </template>
 <script lang='ts'>
-import { defineComponent, ref, type PropType } from 'vue';
+import { defineComponent, ref, type PropType, computed } from 'vue';
 import MapMarkerInfoWatch from './MapMarkerInfoWatch.vue';
 import MapMarkerInfoList from './MapMarkerInfoList.vue';
 import MapMarkerInfoEdit from './MapMarkerInfoEdit.vue';
@@ -30,7 +31,7 @@ import type { IMapMarker } from '@/interfaces/IMapMarkers';
 
 export default defineComponent({
     components: { MapMarkerInfoWatch, MapMarkerInfoEdit, MapMarkerInfoList },
-    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked', 'updatePhoto'],
+    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked', 'updatePhoto', 'deletePhoto'],
     props: {
         activeMarker: {
             type: Object as PropType<IMapMarker>
@@ -43,7 +44,16 @@ export default defineComponent({
         },
         allPoints: {
             type: Array<IMapMarker>
+        },
+        updateKey: {
+            type: Number,
         }
     },
+    setup(props) {
+        const updateKey = computed(() => props.updateKey);
+        return {
+            updateKey
+        }
+    }
 });
 </script>

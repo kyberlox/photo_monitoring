@@ -1,17 +1,19 @@
 <template>
-<div class="mt-5">
+<div class="mt-5 w-full">
     <div v-if="!activeMarker"
          class="text-lg ">Выберите точку на карте</div>
     <div class="px-4 left text-lg">
         {{ activeMarker?.name }}
     </div>
 </div>
-<div class="flex flex-col mt-5 border-gray-50 bg-gray-50 border p-2 rounded-md"
+<div class="flex flex-col mt-5 border-gray-50 bg-gray-50 border p-2 rounded-md w-full"
      v-for="(image, index) in activeMarker?.photos"
-     :key="index + 'img'"
-     @click="{ activeImage = 'src/assets/img/test.jpg'; visibleModal = true }">
+     :key="index + 'img'">
     <img class="object-cover rounded-sm w-full h-full mt-2  cursor-pointer hover:scale-101 transition duration-200"
-         :src="image.file_url" />
+         :src="image.file_url"
+         @click="{ activeImage = image.file_url; visibleModal = true }" />
+    <span class="text-sm underline text-red-600 hover:text-red-400 cursor-pointer"
+          @click="$emit('deletePhoto', image.id)">Удалить</span>
 </div>
 <FileLoader v-if="activeMarker"
             :coordinates="(activeMarker?.coordinates as LngLat)"
@@ -32,7 +34,7 @@ import type { LngLat } from '@yandex/ymaps3-types';
 
 export default defineComponent({
     components: { SlotModal, FileLoader },
-    emits: ['updatePhoto'],
+    emits: ['updatePhoto', 'deletePhoto'],
     props: {
         activeMarker: {
             type: Object as PropType<IMapMarker>

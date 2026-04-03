@@ -8,7 +8,7 @@
      @dragleave.prevent="dragOver = false"
      @drop.prevent="handleDrop"
      @click="triggerFileInput">
-    <input ref="fileInputRef"
+    <input :ref="'fileInputRef'"
            type="file"
            class="hidden"
            multiple
@@ -81,7 +81,8 @@ export default defineComponent({
             triggerFileInput,
             handleFileSelect,
             handleAddNewPoint,
-            files
+            files,
+            fileInputRef
         }
     }
 });

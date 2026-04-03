@@ -10,10 +10,12 @@
                  :allPoints=mapPoints
                  :newCoordinates="newCoordinates"
                  :pageType="pageType"
+                 :updateKey="updateKey"
                  @markerClicked="markerClicked"
                  @deletePoint="deletePoint"
                  @addNewPoint="addNewPoint"
-                 @updatePhoto="updatePhoto" />
+                 @updatePhoto="updatePhoto"
+                 @deletePhoto="deletePhoto" />
 </div>
 </template>
 <script lang='ts'>
@@ -37,17 +39,21 @@ export default defineComponent({
   setup() {
     const useMapInfo = useMapInfoData();
     const activePoint = ref();
-    const activeMarker = ref<IMapMarker>();
+    const activeMarker = ref<IMapMarker | null>();
     const pageType = ref('watch');
     const newCoordinates = ref<number[]>([]);
+    const updateKey = ref(0);
 
     const markerClicked = (newVal: IMapMarker) => {
       pageType.value = 'watch';
       activeMarker.value = newVal;
     }
     const pageTypeChanged = (type: string) => {
-      pageType.value = type
-      newCoordinates.value = []
+      pageType.value = type;
+      if (type !== 'watch') {
+        activeMarker.value = null;
+      }
+      newCoordinates.value = [];
     }
     const mapClicked = (e: YandexMapDefaultMarkerSettings) => {
       (newCoordinates.value as LngLat) = e.coordinates;
@@ -56,11 +62,18 @@ export default defineComponent({
     const getPoints = () => {
       Api.get('/locations/all')
         .then((data) => useMapInfo.setPoints(data))
+        .finally(() => {
+          if (activeMarker.value) {
+            activeMarker.value = useMapInfo.getPoints.find(e => e.id == activeMarker.value?.id)
+          }
+        })
     }
 
     const addNewPoint = (newData: IMapMarker) => {
       Api.post('/locations/add', newData)
+        .then((data) => { pageType.value = 'watch'; activeMarker.value = data; })
         .finally(() => getPoints())
+
     }
 
     const deletePoint = (id: number) => {
@@ -79,6 +92,11 @@ export default defineComponent({
         .then(() => getPoints())
     }
 
+    const deletePhoto = (id: number) => {
+      Api.delete(`photos/id=${id}`)
+        .finally(() => getPoints())
+    }
+
     onMounted(() => {
       getPoints();
     })
@@ -88,6 +106,7 @@ export default defineComponent({
       activeMarker,
       pageType,
       newCoordinates,
+      updateKey,
       addNewPoint,
       mapClicked,
       pageTypeChanged,
@@ -95,6 +114,7 @@ export default defineComponent({
       getPoints,
       deletePoint,
       updatePhoto,
+      deletePhoto,
       mapPoints: computed(() => useMapInfo.getPoints)
     }
   }
