@@ -14,7 +14,7 @@ sys.path.insert(0, data_dir)
 sys.path.insert(0, app_dir)
 
 from database.database import engine, Base
-from models import location, media
+from models import location, photo
 
 
 async def create_tables():
