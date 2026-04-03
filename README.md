@@ -19,7 +19,6 @@
    - Список прикреплённых фотографий
 
 2. **Фото (Photo)**
-   - Название
    - Комментарий (опционально)
    - Файл изображения (хранится на диске, путь в БД)
    - URL для доступа к файлу (`/static/photos/...`)
@@ -131,7 +130,6 @@ curl http://localhost:8000/locations/all
   "photos": [
     {
       "id": 1,
-      "title": "photo1.jpg",
       "comment": null,
       "created_at": "2026-04-03T05:30:00",
       "file_url": "http://localhost:8000/static/photos/abc123.jpg",
@@ -141,14 +139,32 @@ curl http://localhost:8000/locations/all
 }
 ```
 
-### Загрузка отдельного фото
+### Загрузка фото
+
+Можно загрузить одно или несколько фото к существующей локации:
 
 ```bash
 curl -X POST http://localhost:8000/photos/add \
-  -F "title=Закат" \
   -F "comment=Красивый закат над озером" \
   -F "location_id=1" \
-  -F "file=@/path/to/sunset.jpg"
+  -F "photos=@/path/to/sunset.jpg" \
+  -F "photos=@/path/to/another.jpg"
+```
+
+### Обновление фото
+
+Можно обновить комментарий или заменить изображение:
+
+```bash
+curl -X PUT http://localhost:8000/photos/id=1 \
+  -F "comment=Обновлённый комментарий" \
+  -F "photo=@/path/to/new_image.jpg"
+```
+
+### Удаление фото
+
+```bash
+curl -X DELETE http://localhost:8000/photos/id=1
 ```
 
 ### Доступ к статическим файлам
@@ -189,7 +205,7 @@ photo_monitoring/
 
 - Фотографии сохраняются на диск в папку `uploads/photos/`
 - В базе данных хранится только путь к файлу (`file_path`)
-- При загрузке клиент отправляет файл через `multipart/form-data` (поле `file` или `photos`)
+- При загрузке клиент отправляет файл через `multipart/form-data` (поле `photos`)
 - Сервер генерирует уникальное имя файла (UUID) и сохраняет его на диск
 - Для доступа к файлу используется статический маршрут FastAPI `/static/`, который монтируется на папку `/uploads`
 - При запросе фото через API возвращается полный URL (`file_url`) для доступа к файлу

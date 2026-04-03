@@ -79,10 +79,7 @@ async def create_location(
         for photo_file in photos:
             if photo_file.filename:  # игнорируем пустые файлы
                 file_path = save_upload_file(photo_file)
-                # Используем оригинальное имя файла как title
-                title = photo_file.filename
                 new_photo = Photo(
-                    title=title,
                     comment=None,
                     file_path=file_path,
                     location_id=new_location.id
