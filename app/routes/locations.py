@@ -47,12 +47,14 @@ async def get_location(location_id: int, db: AsyncSession = Depends(get_db)):
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
     
+    # Создаём схему локации
+    location_schema = LocationSchema.model_validate(location, from_attributes=True)
     # Обогащаем фото URL
     enriched_photos = []
     for photo in location.photos:
         enriched_photos.append(await enrich_photo_with_url(photo))
-    location.photos = enriched_photos
-    return location
+    location_schema.photos = enriched_photos
+    return location_schema
 
 
 @router.post("/add", response_model=LocationSchema)
@@ -96,13 +98,15 @@ async def create_location(
         .options(selectinload(Location.photos))
     )
     new_location = result.scalar_one()
+    # Создаём схему локации
+    location_schema = LocationSchema.model_validate(new_location, from_attributes=True)
     # Обогащаем фото URL
     enriched_photos = []
     for photo in new_location.photos:
         enriched_photos.append(await enrich_photo_with_url(photo))
-    new_location.photos = enriched_photos
+    location_schema.photos = enriched_photos
     
-    return new_location
+    return location_schema
 
 
 @router.put("/id={location_id}", response_model=LocationSchema)
@@ -140,12 +144,14 @@ async def update_location(
         .options(selectinload(Location.photos))
     )
     location = result.scalar_one()
+    # Создаём схему локации
+    location_schema = LocationSchema.model_validate(location, from_attributes=True)
     # Обогащаем фото URL
     enriched_photos = []
     for photo in location.photos:
         enriched_photos.append(await enrich_photo_with_url(photo))
-    location.photos = enriched_photos
-    return location
+    location_schema.photos = enriched_photos
+    return location_schema
 
 
 @router.delete("/id={location_id}")
