@@ -167,6 +167,19 @@ curl -X PUT http://localhost:8000/photos/id=1 \
 curl -X DELETE http://localhost:8000/photos/id=1
 ```
 
+### Удаление фото по URL
+
+Если известен URL файла, можно удалить его напрямую:
+
+```bash
+curl -X DELETE "http://localhost:8000/photos/by-url?url=/static/photos/abc123.jpg"
+```
+
+Или с полным URL:
+```bash
+curl -X DELETE "http://localhost:8000/photos/by-url?url=http://localhost:8000/static/photos/abc123.jpg"
+```
+
 ### Доступ к статическим файлам
 
 Загруженные фото доступны по URL:
