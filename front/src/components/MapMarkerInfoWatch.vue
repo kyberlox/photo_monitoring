@@ -37,7 +37,7 @@ export default defineComponent({
     emits: ['updatePhoto', 'deletePhoto'],
     props: {
         activeMarker: {
-            type: Object as PropType<IMapMarker>
+            type: Object as PropType<IMapMarker | null>
         },
     },
     setup() {

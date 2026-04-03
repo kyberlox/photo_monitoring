@@ -51,7 +51,7 @@ export default defineComponent({
     const pageTypeChanged = (type: string) => {
       pageType.value = type;
       if (type !== 'watch') {
-        activeMarker.value = null;
+        activeMarker.value = {};
       }
       newCoordinates.value = [];
     }
@@ -64,7 +64,8 @@ export default defineComponent({
         .then((data) => useMapInfo.setPoints(data))
         .finally(() => {
           if (activeMarker.value) {
-            activeMarker.value = useMapInfo.getPoints.find(e => e.id == activeMarker.value?.id)
+            if (activeMarker.value && 'id' in activeMarker.value)
+              activeMarker.value = useMapInfo.getPoints.find(e => e.id == activeMarker.value?.id)
           }
         })
     }

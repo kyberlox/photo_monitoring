@@ -22,9 +22,6 @@ export default defineComponent({
     emits: ['deletePoint', 'markerClicked'],
 
     props: {
-        activeMarker: {
-            type: Object as PropType<IMapMarker>
-        },
         pageType: {
             type: String
         },

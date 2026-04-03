@@ -1,12 +1,12 @@
 import { defineStore } from "pinia";
-
+import type { IMapMarker } from "@/interfaces/IMapMarkers";
 export const useMapInfoData = defineStore('mapInfoData', {
     state: () => ({
-      points: []
+      points: [] as IMapMarker[]
     }),
 
     actions: {
-        setPoints(points: []){
+        setPoints(points: IMapMarker[]){
             this.points = points;
         }
     },
