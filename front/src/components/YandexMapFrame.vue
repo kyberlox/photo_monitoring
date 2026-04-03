@@ -15,7 +15,7 @@
                             :id=point.id
                             :settings="{ coordinates: point.coordinates as LngLat, onClick: () => $emit('markerClicked', point) }">
     </YandexMapDefaultMarker>
-    <YandexMapDefaultMarker v-if="newPoint && newPoint.coordinates"
+    <YandexMapDefaultMarker v-if="newPoint && newPoint.coordinates?.length"
                             :id=newPoint.id
                             :settings="{ coordinates: newPoint.coordinates }">
     </YandexMapDefaultMarker>
