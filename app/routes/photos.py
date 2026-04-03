@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Form, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -7,25 +7,24 @@ from app.database.database import get_db
 from app.models.photo import Photo
 from app.models.location import Location
 from app.schemas.photo import PhotoCreate, PhotoUpdate, Photo as PhotoSchema
-from app.utils.file_storage import save_base64_as_file, file_to_base64, delete_file
+from app.utils.file_storage import save_upload_file, generate_file_url, delete_file
 
 router = APIRouter(prefix="/photos", tags=["photos"])
 
 
-async def enrich_photo_with_base64(photo: Photo) -> PhotoSchema:
-    """Добавляет base64 данные к фото для ответа."""
-    base64_data = None
+async def enrich_photo_with_url(photo: Photo) -> PhotoSchema:
+    """Добавляет URL к фото для ответа."""
+    file_url = None
     if photo.file_path:
-        base64_data = file_to_base64(photo.file_path)
+        file_url = generate_file_url(photo.file_path)
     
     return PhotoSchema(
         id=photo.id,
         title=photo.title,
         comment=photo.comment,
         created_at=photo.created_at,
-        file_path=photo.file_path,
+        file_url=file_url,
         location_id=photo.location_id,
-        base64_data=base64_data,
     )
 
 
@@ -40,7 +39,7 @@ async def get_photos(
     
     result = await db.execute(query)
     photos_list = result.scalars().all()
-    return [await enrich_photo_with_base64(p) for p in photos_list]
+    return [await enrich_photo_with_url(p) for p in photos_list]
 
 
 @router.get("/id={photo_id}", response_model=PhotoSchema)
@@ -49,44 +48,46 @@ async def get_photo(photo_id: int, db: AsyncSession = Depends(get_db)):
     photo = result.scalar_one_or_none()
     if photo is None:
         raise HTTPException(status_code=404, detail="Фото не найдено")
-    return await enrich_photo_with_base64(photo)
+    return await enrich_photo_with_url(photo)
 
 
 @router.post("/add", response_model=PhotoSchema)
-async def create_photo(photo_data: PhotoCreate, db: AsyncSession = Depends(get_db)):
+async def create_photo(
+    title: str = Form(...),
+    comment: str = Form(None),
+    location_id: int = Form(...),
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+):
     # Проверка существования локации
-    result = await db.execute(select(Location).where(Location.id == photo_data.location_id))
+    result = await db.execute(select(Location).where(Location.id == location_id))
     location = result.scalar_one_or_none()
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
     
-    if not photo_data.base64_data:
-        raise HTTPException(
-            status_code=400,
-            detail="Для фото необходимо передать base64_data"
-        )
-    
     # Сохраняем файл на диск
-    file_path = save_base64_as_file(photo_data.base64_data)
+    file_path = save_upload_file(file)
     
     # Создаем запись в БД
     new_photo = Photo(
-        title=photo_data.title,
-        comment=photo_data.comment,
+        title=title,
+        comment=comment,
         file_path=file_path,
-        location_id=photo_data.location_id,
+        location_id=location_id,
     )
     db.add(new_photo)
     await db.commit()
     await db.refresh(new_photo)
     
-    return await enrich_photo_with_base64(new_photo)
+    return await enrich_photo_with_url(new_photo)
 
 
 @router.put("/id={photo_id}", response_model=PhotoSchema)
 async def update_photo(
     photo_id: int,
-    photo_data: PhotoUpdate,
+    title: str = Form(None),
+    comment: str = Form(None),
+    file: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(select(Photo).where(Photo.id == photo_id))
@@ -94,25 +95,27 @@ async def update_photo(
     if photo is None:
         raise HTTPException(status_code=404, detail="Фото не найдено")
     
-    update_data = photo_data.model_dump(exclude_unset=True)
+    update_data = {}
+    if title is not None:
+        update_data["title"] = title
+    if comment is not None:
+        update_data["comment"] = comment
     
-    # Если пришел новый base64
-    if "base64_data" in update_data and update_data["base64_data"]:
+    # Если пришел новый файл
+    if file is not None and file.filename:
         # Удаляем старый файл
         if photo.file_path:
             delete_file(photo.file_path)
         # Сохраняем новый
-        new_file_path = save_base64_as_file(update_data["base64_data"])
+        new_file_path = save_upload_file(file)
         photo.file_path = new_file_path
-        # Удаляем base64_data из update_data, чтобы не пытаться записать в модель
-        del update_data["base64_data"]
     
     for field, value in update_data.items():
         setattr(photo, field, value)
     
     await db.commit()
     await db.refresh(photo)
-    return await enrich_photo_with_base64(photo)
+    return await enrich_photo_with_url(photo)
 
 
 @router.delete("/id={photo_id}")

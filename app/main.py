@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.database.database import engine, Base
 from app.routes import locations, photos
@@ -22,6 +23,9 @@ app.add_middleware(
 # Подключение роутеров
 app.include_router(locations.router)
 app.include_router(photos.router)
+
+# Раздача статических файлов (фото)
+app.mount("/static", StaticFiles(directory="/uploads"), name="static")
 
 
 @app.on_event("startup")

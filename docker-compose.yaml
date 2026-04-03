@@ -13,6 +13,7 @@ services:
       - NGINX_HOST=${DOMAIN}
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
+      - ./uploads:/uploads
     networks:
       - app-network
 
@@ -36,6 +37,7 @@ services:
     container_name: fastapi_async
     volumes:
       - ./app:/data/app
+      - ./uploads:/uploads
     env_file:
       - .env
     environment:

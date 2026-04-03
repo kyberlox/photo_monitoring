@@ -1,101 +1,75 @@
-import base64
-import binascii
 import os
 import uuid
-import mimetypes
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
+from fastapi import UploadFile
 
 from app.core.config import settings
 
-# Директории для хранения загруженных файлов
-UPLOAD_BASE = Path("uploads")
+# Базовый путь для загрузки файлов (внутри контейнера)
+UPLOAD_BASE = Path("/uploads")
 PHOTO_DIR = UPLOAD_BASE / "photos"
-VIDEO_DIR = UPLOAD_BASE / "videos"
 
-for directory in [UPLOAD_BASE, PHOTO_DIR, VIDEO_DIR]:
+# Создаём директории, если они не существуют
+for directory in [UPLOAD_BASE, PHOTO_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
 
-def detect_media_type_from_base64(base64_data: str) -> Tuple[str, str]:
+def save_upload_file(upload_file: UploadFile, filename: Optional[str] = None) -> str:
     """
-    Определяет тип медиа (photo/video) и расширение файла из base64 строки.
-    Возвращает (media_type, extension).
-    """
-    if not base64_data:
-        raise ValueError("Base64 данные пусты")
+    Сохраняет загруженный файл на диск и возвращает путь к файлу.
     
-    # Извлекаем заголовок data:image/png;base64,...
-    if "," in base64_data:
-        header = base64_data.split(",")[0]
+    Args:
+        upload_file: объект UploadFile из FastAPI
+        filename: опциональное имя файла (без расширения). Если не указано, генерируется UUID.
+    
+    Returns:
+        Абсолютный путь к сохранённому файлу (строка).
+    """
+    # Определяем расширение из оригинального имени файла
+    original_filename = upload_file.filename
+    if original_filename:
+        ext = Path(original_filename).suffix.lower()
+        if ext not in [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"]:
+            ext = ".jpg"  # fallback
     else:
-        header = ""
-    
-    if "image/" in header:
-        # Определяем расширение из MIME типа
-        mime_type = header.split(":")[1].split(";")[0]
-        ext = mimetypes.guess_extension(mime_type) or ".jpg"
-        return "photo", ext
-    elif "video/" in header:
-        mime_type = header.split(":")[1].split(";")[0]
-        ext = mimetypes.guess_extension(mime_type) or ".mp4"
-        return "video", ext
-    else:
-        # По умолчанию считаем изображением
-        return "photo", ".jpg"
-
-
-def save_base64_as_file(base64_data: str, filename: Optional[str] = None) -> str:
-    """
-    Сохраняет base64 строку как файл на диск и возвращает путь к файлу.
-    Автоматически определяет тип (photo/video) и сохраняет в соответствующую папку.
-    """
-    if not base64_data:
-        raise ValueError("Base64 данные пусты")
-    
-    # Извлекаем данные из base64
-    if "," in base64_data:
-        header, data = base64_data.split(",", 1)
-    else:
-        header = ""
-        data = base64_data
-    
-    # Декодируем
-    try:
-        file_data = base64.b64decode(data, validate=True)
-    except (binascii.Error, ValueError) as e:
-        raise ValueError(f"Некорректные base64 данные: {e}")
-    
-    # Определяем тип и расширение
-    media_type, extension = detect_media_type_from_base64(base64_data)
+        ext = ".jpg"
     
     # Генерируем уникальное имя файла
     if filename is None:
-        filename = f"{uuid.uuid4().hex}{extension}"
+        filename = f"{uuid.uuid4().hex}{ext}"
+    else:
+        # Если имя предоставлено, добавляем расширение, если его нет
+        if not filename.lower().endswith(ext):
+            filename += ext
     
-    # Выбираем директорию
-    if media_type == "photo":
-        file_path = PHOTO_DIR / filename
-    else:  # video
-        file_path = VIDEO_DIR / filename
+    # Полный путь к файлу
+    file_path = PHOTO_DIR / filename
     
+    # Сохраняем файл
     with open(file_path, "wb") as f:
-        f.write(file_data)
+        content = upload_file.file.read()
+        f.write(content)
     
+    # Возвращаем путь как строку (абсолютный)
     return str(file_path)
 
 
-def file_to_base64(file_path: str) -> Optional[str]:
+def generate_file_url(file_path: str) -> str:
     """
-    Читает файл с диска и возвращает его в формате base64.
+    Генерирует URL для доступа к файлу через статику.
+    
+    Предполагается, что Nginx раздаёт файлы из /uploads по URL /static/
     """
-    if not os.path.exists(file_path):
-        return None
+    # Преобразуем абсолютный путь в относительный относительно UPLOAD_BASE
+    try:
+        relative_path = Path(file_path).relative_to(UPLOAD_BASE)
+    except ValueError:
+        # Если файл не внутри UPLOAD_BASE, возвращаем как есть
+        relative_path = Path(file_path).name
     
-    with open(file_path, "rb") as f:
-        data = f.read()
-    
-    return base64.b64encode(data).decode("utf-8")
+    # URL вида /static/photos/...
+    return f"/static/{relative_path}"
 
 
 def delete_file(file_path: str) -> bool:
@@ -107,3 +81,10 @@ def delete_file(file_path: str) -> bool:
         return True
     except OSError:
         return False
+
+
+def file_exists(file_path: str) -> bool:
+    """
+    Проверяет, существует ли файл.
+    """
+    return os.path.exists(file_path)

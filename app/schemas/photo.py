@@ -11,21 +11,20 @@ class PhotoBase(BaseModel):
 
 class PhotoCreate(PhotoBase):
     location_id: int
-    base64_data: Optional[str] = Field(None, description="Фото в формате base64")
+    # file будет передаваться как UploadFile в form-data, не как поле схемы
 
 
 class PhotoUpdate(BaseModel):
     title: Optional[str] = None
     comment: Optional[str] = None
-    base64_data: Optional[str] = Field(None, description="Новое фото в base64")
+    # file будет передаваться как UploadFile в form-data, не как поле схемы
 
 
 class Photo(PhotoBase):
     id: int
     created_at: datetime
-    file_path: Optional[str] = None  # путь к файлу
+    file_url: Optional[str] = None   # URL для доступа к файлу через статику
     location_id: int
-    base64_data: Optional[str] = None  # будет заполнено при запросе
 
     class Config:
         from_attributes = True
