@@ -21,7 +21,7 @@
 2. **Фото (Photo)**
    - Комментарий (опционально)
    - Файл изображения (хранится на диске, путь в БД)
-   - URL для доступа к файлу (`/static/photos/...`)
+   - URL для доступа к файлу (`/api/static/photos/...`)
    - Дата создания
    - Связь с локацией
 
@@ -132,7 +132,7 @@ curl http://localhost:8000/locations/all
       "id": 1,
       "comment": null,
       "created_at": "2026-04-03T05:30:00",
-      "file_url": "http://localhost:8000/static/photos/abc123.jpg",
+      "file_url": "http://localhost:8000/api/static/photos/abc123.jpg",
       "location_id": 1
     }
   ]
@@ -172,24 +172,24 @@ curl -X DELETE http://localhost:8000/photos/id=1
 Если известен URL файла, можно удалить его напрямую:
 
 ```bash
-curl -X DELETE "http://localhost:8000/photos/by-url?url=/static/photos/abc123.jpg"
+curl -X DELETE "http://localhost:8000/photos/by-url?url=/api/static/photos/abc123.jpg"
 ```
 
 Или с полным URL:
 ```bash
-curl -X DELETE "http://localhost:8000/photos/by-url?url=http://localhost:8000/static/photos/abc123.jpg"
+curl -X DELETE "http://localhost:8000/photos/by-url?url=http://localhost:8000/api/static/photos/abc123.jpg"
 ```
 
 ### Доступ к статическим файлам
 
 Загруженные фото доступны по URL:
 ```
-http://localhost:8000/static/photos/{filename}
+http://localhost:8000/api/static/photos/{filename}
 ```
 
 Пример:
 ```bash
-curl http://localhost:8000/static/photos/abc123.jpg
+curl http://localhost:8000/api/static/photos/abc123.jpg
 ```
 
 ## Структура проекта
