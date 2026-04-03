@@ -25,7 +25,7 @@ app.include_router(locations.router)
 app.include_router(photos.router)
 
 # Раздача статических файлов (фото)
-app.mount("/static", StaticFiles(directory="/uploads"), name="static")
+app.mount("/api/static", StaticFiles(directory="/uploads"), name="static")
 
 
 @app.on_event("startup")

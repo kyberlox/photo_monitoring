@@ -10,7 +10,7 @@ from app.models.location import Location
 from app.schemas.photo import PhotoCreate, PhotoUpdate, Photo as PhotoSchema
 from app.utils.file_storage import save_upload_file, generate_file_url, delete_file
 
-router = APIRouter(prefix="/photos", tags=["photos"])
+router = APIRouter(prefix="/api/photos", tags=["photos"])
 
 
 async def enrich_photo_with_url(photo: Photo) -> PhotoSchema:

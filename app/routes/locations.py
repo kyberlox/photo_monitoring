@@ -11,7 +11,7 @@ from app.schemas.location import Location as LocationSchema
 from app.utils.file_storage import save_upload_file
 from app.routes.photos import enrich_photo_with_url
 
-router = APIRouter(prefix="/locations", tags=["locations"])
+router = APIRouter(prefix="/api/locations", tags=["locations"])
 
 
 @router.get("/all", response_model=list[LocationSchema])
