@@ -10,7 +10,8 @@
            height="100%">
     <YandexMapDefaultSchemeLayer />
     <YandexMapDefaultFeaturesLayer />
-    <YandexMapDefaultMarker v-for="point in allPoints"
+    <YandexMapDefaultMarker v-if="allPoints?.length"
+                            v-for="point in allPoints"
                             :id=point.id
                             :settings="{ coordinates: point.coordinates as LngLat, onClick: () => $emit('markerClicked', point) }">
     </YandexMapDefaultMarker>
