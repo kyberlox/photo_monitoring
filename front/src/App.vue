@@ -5,12 +5,14 @@
   <YandexMapFrame :allPoints=mapPoints
                   @markerClicked="markerClicked"
                   @mapClicked="mapClicked"
+                  :newCoordinates="newCoordinates"
                   :pageType="pageType" />
   <MapMarkerInfo :activeMarker="activeMarker"
                  :allPoints=mapPoints
                  :newCoordinates="newCoordinates"
                  :pageType="pageType"
                  :updateKey="updateKey"
+                 @coordinatesChange="(newCords) => newCoordinates = newCords"
                  @markerClicked="markerClicked"
                  @deletePoint="deletePoint"
                  @addNewPoint="addNewPoint"

@@ -24,7 +24,7 @@
 </YandexMap>
 </template>
 <script lang='ts'>
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, watch, type PropType } from 'vue';
 import { shallowRef } from 'vue';
 import type { LngLat, YMap } from '@yandex/ymaps3-types';
 import {
@@ -49,16 +49,26 @@ export default defineComponent({
         },
         allPoints: {
             type: Array<IMapMarker>
+        },
+        newCoordinates: {
+            type: Object as PropType<LngLat>
         }
     },
     emits: ['markerClicked', 'mapClicked'],
     setup(props, { emit }) {
+        console.log(props.newCoordinates);
+
         const map = shallowRef<null | YMap>(null);
-        const newPoint = ref<IMapMarker>({ coordinates: null });
+        const newPoint = ref<IMapMarker>({ coordinates: props.newCoordinates || null });
 
         watch((props), () => {
-            if (props.pageType)
+            if (props.pageType) {
                 newPoint.value = ({ coordinates: null });
+            }
+            if (props.newCoordinates?.length) {
+                newPoint.value = { coordinates: props.newCoordinates };
+            }
+
         }, { deep: true })
 
         const onMapClick: DomEventHandler = (object, event) => {

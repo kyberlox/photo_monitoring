@@ -1,5 +1,5 @@
 <template>
-<div class="relative w-full border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ease-in-out w-full min-h-[200px] "
+<div class="relative mt-4 w-full border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ease-in-out w-full min-h-[200px] "
      :class="{
         'border-blue-500 bg-blue-50': dragOver,
         'border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-gray-100': !dragOver,
@@ -20,7 +20,7 @@
         </div>
     </div>
 </div>
-<div class="flex w-fit border p-2 rounded-md bg-blue-50 hover:bg-blue-100 border-blue-500 cursor-pointer"
+<div class="flex w-fit border p-2 rounded-md bg-blue-50 hover:bg-blue-100 border-blue-500 cursor-pointer mt-2"
      @click="handleAddNewPoint">
     Добавить
 </div>
