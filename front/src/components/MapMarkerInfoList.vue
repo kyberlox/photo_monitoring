@@ -2,7 +2,7 @@
 <div class="text-lg mt-5">Выберите точку из списка</div>
 <div v-for="point in allPoints"
      :key="point.id"
-     class="flex flex-row justify-between px-4 w-full">
+     class="flex flex-row justify-between px-4 w-full mt-2">
     <div class="text-md text-blue-600 underline cursor-pointer hover:text-blue-400 duration-200"
          @click="$emit('markerClicked', point)">
         {{ point.name }}
