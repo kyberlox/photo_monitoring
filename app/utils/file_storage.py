@@ -69,7 +69,7 @@ def generate_file_url(file_path: str) -> str:
         relative_path = Path(file_path).name
     
     # URL вида /static/photos/...
-    return f"/static/{relative_path}"
+    return f"/api/static/{relative_path}"
 
 
 def delete_file(file_path: str) -> bool:
@@ -95,8 +95,8 @@ def extract_filepath_from_url(url: str) -> Optional[str]:
     Извлекает путь к файлу на диске из URL статики.
     
     Примеры:
-    - "/static/photos/abc123.jpg" -> "/uploads/photos/abc123.jpg"
-    - "http://localhost:8000/static/photos/abc123.jpg" -> "/uploads/photos/abc123.jpg"
+    - "/api/static/photos/abc123.jpg" -> "/uploads/photos/abc123.jpg"
+    - "http://localhost:8000/api/static/photos/abc123.jpg" -> "/uploads/photos/abc123.jpg"
     """
     # Убираем протокол и домен, если есть
     if "://" in url:
@@ -107,8 +107,10 @@ def extract_filepath_from_url(url: str) -> Optional[str]:
     else:
         url_path = url
     
-    # Убираем префикс /static/
-    if url_path.startswith("/static/"):
+    # Убираем префикс /api/static/ или /static/
+    if url_path.startswith("/api/static/"):
+        url_path = url_path[len("/api/static/"):]
+    elif url_path.startswith("/static/"):
         url_path = url_path[len("/static/"):]
     
     if not url_path:
