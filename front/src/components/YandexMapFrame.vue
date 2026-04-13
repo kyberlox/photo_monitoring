@@ -17,14 +17,14 @@
     </YandexMapDefaultMarker>
     <YandexMapDefaultMarker v-if="newPoint && newPoint.coordinates?.length"
                             :id=newPoint.id
-                            :settings="{ coordinates: newPoint.coordinates }">
+                            :settings="{ coordinates: newPoint.coordinates || [] }">
     </YandexMapDefaultMarker>
     <YandexMapListener v-if="pageType == 'edit'"
                        :settings="{ onClick: onMapClick }" />
 </YandexMap>
 </template>
 <script lang='ts'>
-import { defineComponent, ref, watch, type PropType } from 'vue';
+import { defineComponent, ref, watch, watchEffect, type PropType } from 'vue';
 import { shallowRef } from 'vue';
 import type { LngLat, YMap } from '@yandex/ymaps3-types';
 import {
@@ -56,8 +56,6 @@ export default defineComponent({
     },
     emits: ['markerClicked', 'mapClicked'],
     setup(props, { emit }) {
-        console.log(props.newCoordinates);
-
         const map = shallowRef<null | YMap>(null);
         const newPoint = ref<IMapMarker>({ coordinates: props.newCoordinates || [] });
 

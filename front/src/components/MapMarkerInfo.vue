@@ -3,8 +3,7 @@
     <div class="rounded-lg bg-white h-full w-full flex flex-col px-3">
         <div v-if="pageType == 'list'"
              class="flex flex-col items-start max-h-full overflow-y-auto">
-            <MapMarkerInfoList :activeMarker="activeMarker"
-                               :allPoints="allPoints"
+            <MapMarkerInfoList :allPoints="allPoints"
                                @markerClicked="(id) => $emit('markerClicked', id)"
                                @deletePoint="(id) => $emit('deletePoint', id)" />
         </div>

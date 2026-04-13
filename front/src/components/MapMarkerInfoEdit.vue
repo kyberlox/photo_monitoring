@@ -9,7 +9,7 @@
         <span class="mt-2">Координаты:</span>
         <input class="rounded-md border border-gray-400 px-3 py-2 outline-none w-full mt-1"
                v-model="inputCoordinates"
-               @change="$emit('coordinatesChange', String(inputCoordinates).split(',').map((e) => Number(e)))"
+               @change="$emit('coordinatesChange', inputCoordinates ? String(inputCoordinates).split(',').map((e) => Number(e)) : [])"
                placeholder="введите координаты" />
         <FileLoader v-if="coordinates.length"
                     :coordinates="coordinates"
