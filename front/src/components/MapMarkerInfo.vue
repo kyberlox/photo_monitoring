@@ -41,7 +41,7 @@ export default defineComponent({
             type: String
         },
         newCoordinates: {
-            type: Object as PropType<LngLat>
+            type: Object as PropType<LngLat | []>
         },
         allPoints: {
             type: Array<IMapMarker>

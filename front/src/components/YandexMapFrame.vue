@@ -51,7 +51,7 @@ export default defineComponent({
             type: Array<IMapMarker>
         },
         newCoordinates: {
-            type: Object as PropType<LngLat>
+            type: Object as PropType<LngLat | []>
         }
     },
     emits: ['markerClicked', 'mapClicked'],
@@ -59,11 +59,11 @@ export default defineComponent({
         console.log(props.newCoordinates);
 
         const map = shallowRef<null | YMap>(null);
-        const newPoint = ref<IMapMarker>({ coordinates: props.newCoordinates || null });
+        const newPoint = ref<IMapMarker>({ coordinates: props.newCoordinates || [] });
 
         watch((props), () => {
             if (props.pageType) {
-                newPoint.value = ({ coordinates: null });
+                newPoint.value = ({ coordinates: [] });
             }
             if (props.newCoordinates?.length) {
                 newPoint.value = { coordinates: props.newCoordinates };

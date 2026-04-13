@@ -28,7 +28,7 @@ export default defineComponent({
     emits: ['addNewPoint', 'coordinatesChange'],
     props: {
         coordinates: {
-            type: Object as PropType<LngLat>,
+            type: Object as PropType<LngLat | []>,
             required: true
         }
     },
@@ -36,8 +36,6 @@ export default defineComponent({
         const name = ref();
         const inputCoordinates = ref();
         watch(props, () => {
-            console.log(props.coordinates);
-
             if (props.coordinates.length > 1)
                 inputCoordinates.value = String(props.coordinates).split(',').map((e) => Number(e));
         }, { immediate: true, deep: true })

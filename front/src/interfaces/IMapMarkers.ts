@@ -3,7 +3,7 @@ import type { LngLat } from '@yandex/ymaps3-types';
 export interface IMapMarker{
     id?: number,
     name?: string,
-    coordinates?: LngLat | null,
+    coordinates?: LngLat | [],
     photos?:IPhoto[]
 }
 

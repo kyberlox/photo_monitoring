@@ -43,7 +43,7 @@ export default defineComponent({
     const activePoint = ref();
     const activeMarker = ref<IMapMarker | null>();
     const pageType = ref('watch');
-    const newCoordinates = ref<number[]>([]);
+    const newCoordinates = ref<[] | LngLat>([]);
     const updateKey = ref(0);
 
     const markerClicked = (newVal: IMapMarker) => {
