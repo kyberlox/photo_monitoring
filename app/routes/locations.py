@@ -122,7 +122,8 @@ async def update_location(
     location = result.scalar_one_or_none()
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
-    
+    print("tyt")
+
     if name is not None:
         location.name = name
     if coord_x is not None and coord_y is not None:
@@ -137,6 +138,8 @@ async def update_location(
         #     status_code=400,
         #     detail="Необходимо передать обе координаты (coord_x и coord_y)"
         # )
+
+    print("tyt")
     
     await db.commit()
     # Перезагружаем локацию с фото
