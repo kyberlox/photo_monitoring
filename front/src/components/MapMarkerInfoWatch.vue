@@ -5,6 +5,9 @@
     <div class="px-4 left text-lg">
         {{ activeMarker?.name }}
     </div>
+    <div class="px-4 left text-lg">
+        {{ activeMarker?.coordinates }}
+    </div>
 </div>
 <div class="flex flex-col mt-5 border-gray-50 bg-gray-50 border p-2 rounded-md w-full"
      v-for="(image, index) in activeMarker?.photos"
