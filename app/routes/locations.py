@@ -106,7 +106,7 @@ async def create_location(
     return location_schema
 
 
-@router.put("/id={location_id}", response_model=LocationSchema)
+@router.put("/id={location_id}")#, response_model=LocationSchema)
 async def update_location(
     location_id: int,
     name: Optional[str] = Form(None),
@@ -122,16 +122,24 @@ async def update_location(
     location = result.scalar_one_or_none()
     if location is None:
         raise HTTPException(status_code=404, detail="Локация не найдена")
-    
+    print("tyt")
+
     if name is not None:
         location.name = name
     if coord_x is not None and coord_y is not None:
         location.coordinates = [coord_x, coord_y]
-    elif coord_x is not None or coord_y is not None:
-        raise HTTPException(
-            status_code=400,
-            detail="Необходимо передать обе координаты (coord_x и coord_y)"
-        )
+    elif coord_x is not None:
+        location.coordinates = [coord_x, location.coordinates[1]]
+    elif coord_y is not None:
+        location.coordinates = [location.coordinates[0], coord_y]
+    elif coord_x is None and coord_y is None:
+        location.coordinates = location.coordinates
+        # raise HTTPException(
+        #     status_code=400,
+        #     detail="Необходимо передать обе координаты (coord_x и coord_y)"
+        # )
+
+    print("tyt")
     
     await db.commit()
     # Перезагружаем локацию с фото
