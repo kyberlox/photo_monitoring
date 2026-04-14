@@ -106,7 +106,7 @@ async def create_location(
     return location_schema
 
 
-@router.put("/id={location_id}", response_model=LocationSchema)
+@router.put("/id={location_id}")#, response_model=LocationSchema)
 async def update_location(
     location_id: int,
     name: Optional[str] = Form(None),
