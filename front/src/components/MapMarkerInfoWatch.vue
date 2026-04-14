@@ -12,7 +12,7 @@
 <div class="flex flex-col mt-5 border-gray-50 bg-gray-50 border p-2 rounded-md w-full"
      v-for="(image, index) in activeMarker?.photos"
      :key="index + 'img'">
-    <img class="object-cover rounded-sm w-full h-full mt-2  cursor-pointer hover:scale-101 transition duration-200"
+    <img class="object-cover rounded-sm w-full mt-2 cursor-pointer hover:scale-101 transition duration-200 max-h-[500px]"
          :src="image.file_url"
          @click="{ activeImage = image.file_url; visibleModal = true }" />
     <span class="text-sm underline text-red-600 hover:text-red-400 cursor-pointer"
@@ -24,7 +24,7 @@
             @addNewPoint="(data) => $emit('updatePhoto', data)" />
 <SlotModal v-if="activeImage && visibleModal"
            @close="visibleModal = false">
-    <img class="object-contain w-full h-full"
+    <img class="object-contain w-full h-full max-h-[90vh]"
          :src="activeImage" />
 </SlotModal>
 </template>
