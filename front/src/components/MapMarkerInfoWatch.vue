@@ -1,6 +1,6 @@
 <template>
 <div class="mt-5 w-full">
-    <div v-if="!activeMarker"
+    <div v-if="!activeMarker?.coordinates"
          class="text-lg ">Выберите точку на карте</div>
     <div class="px-4 left text-lg">
         {{ activeMarker?.name }}
@@ -15,7 +15,7 @@
     <span class="text-sm underline text-red-600 hover:text-red-400 cursor-pointer"
           @click="$emit('deletePhoto', image.id)">Удалить</span>
 </div>
-<FileLoader v-if="activeMarker"
+<FileLoader v-if="activeMarker?.coordinates"
             :coordinates="(activeMarker?.coordinates as LngLat)"
             :name="activeMarker?.name"
             @addNewPoint="(data) => $emit('updatePhoto', data)" />
