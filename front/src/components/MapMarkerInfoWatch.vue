@@ -3,7 +3,8 @@
     <div v-if="!activeMarker?.coordinates"
          class="text-lg ">Выберите точку на карте</div>
     <div class="px-4 left text-lg">
-        {{ activeMarker?.name }}
+        <input v-model="pointName"
+               @change="handleNameChange" />
     </div>
     <div class="px-4 left text-lg">
         {{ activeMarker?.coordinates }}
@@ -29,27 +30,41 @@
 </SlotModal>
 </template>
 <script lang="ts">
-import { defineComponent, ref, type PropType } from 'vue';
+import { defineComponent, onMounted, ref, watch, type PropType } from 'vue';
 import SlotModal from './layout/SlotModal.vue';
 import type { IMapMarker } from '@/interfaces/IMapMarkers';
 import FileLoader from './common/FileLoader.vue';
 import type { LngLat } from '@yandex/ymaps3-types';
+import Api from '@/utils/Api';
 
 export default defineComponent({
     components: { SlotModal, FileLoader },
-    emits: ['updatePhoto', 'deletePhoto'],
+    emits: ['updatePhoto', 'deletePhoto', 'handleNameChange'],
     props: {
         activeMarker: {
             type: Object as PropType<IMapMarker | null>
         },
     },
-    setup() {
+    setup(props, { emit }) {
         const activeImage = ref<string>();
         const visibleModal = ref(false);
+        const pointName = ref(props.activeMarker?.name);
+
+        watch((props), () => {
+            if (props.activeMarker?.name) {
+                pointName.value = props.activeMarker?.name;
+            }
+        }, { immediate: true, deep: true })
+
+        const handleNameChange = () => {
+            emit('handleNameChange', props.activeMarker?.id, pointName.value)
+        }
 
         return {
             activeImage,
-            visibleModal
+            visibleModal,
+            pointName,
+            handleNameChange
         }
     }
 })

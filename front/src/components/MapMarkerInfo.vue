@@ -10,6 +10,7 @@
         <div v-else-if="pageType == 'watch'"
              class="flex flex-col items-start  max-h-full overflow-y-auto">
             <MapMarkerInfoWatch :activeMarker="activeMarker"
+                                @handleNameChange="(id, data) => $emit('handleNameChange', id, data)"
                                 @deletePhoto="(data) => $emit('deletePhoto', data)"
                                 @updatePhoto="(data) => $emit('updatePhoto', data)" />
         </div>
@@ -31,7 +32,7 @@ import type { IMapMarker } from '@/interfaces/IMapMarkers';
 import type { LngLat, YMapMarkerProps } from '@yandex/ymaps3-types';
 export default defineComponent({
     components: { MapMarkerInfoWatch, MapMarkerInfoEdit, MapMarkerInfoList },
-    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked', 'updatePhoto', 'deletePhoto', 'coordinatesChange'],
+    emits: ['addNewPoint', 'changeActiveMarker', 'deletePoint', 'markerClicked', 'updatePhoto', 'deletePhoto', 'coordinatesChange', 'handleNameChange'],
     props: {
         activeMarker: {
             type: Object as PropType<IMapMarker | null>

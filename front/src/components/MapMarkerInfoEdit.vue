@@ -32,7 +32,7 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props, { emit }) {
+    setup(props) {
         const name = ref();
         const inputCoordinates = ref();
         watch(props, () => {

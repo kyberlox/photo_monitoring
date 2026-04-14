@@ -12,6 +12,7 @@
                  :newCoordinates="newCoordinates"
                  :pageType="pageType"
                  :updateKey="updateKey"
+                 @handleNameChange="(id, data) => handleNameChange(id, data)"
                  @coordinatesChange="(newCords) => newCoordinates = newCords"
                  @markerClicked="markerClicked"
                  @deletePoint="deletePoint"
@@ -77,7 +78,6 @@ export default defineComponent({
       Api.post('/locations/add', newData)
         .then((data) => { pageType.value = 'watch'; activeMarker.value = data; })
         .finally(() => getPoints())
-
     }
 
     const deletePoint = (id: number) => {
@@ -100,6 +100,12 @@ export default defineComponent({
       Api.delete(`photos/id=${id}`)
         .finally(() => getPoints())
     }
+    const handleNameChange = (id: number, name: string) => {
+      const body = new FormData();
+      body.append('name', name);
+      Api.put(`locations/id=${id}`, body)
+        .then(() => getPoints())
+    }
 
     onMounted(() => {
       getPoints();
@@ -119,6 +125,7 @@ export default defineComponent({
       deletePoint,
       updatePhoto,
       deletePhoto,
+      handleNameChange,
       mapPoints: computed(() => useMapInfo.getPoints)
     }
   }

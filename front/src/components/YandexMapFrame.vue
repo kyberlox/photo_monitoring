@@ -13,7 +13,7 @@
     <YandexMapDefaultMarker v-if="allPoints?.length"
                             v-for="point in allPoints"
                             :id=point.id
-                            :settings="{ coordinates: point.coordinates as LngLat, onClick: () => $emit('markerClicked', point) }">
+                            :settings="{ coordinates: point.coordinates as LngLat, onClick: () => $emit('markerClicked', point), title: point.name, color: { day: 'red', night: 'red' } }">
     </YandexMapDefaultMarker>
     <YandexMapDefaultMarker v-if="newPoint && newPoint.coordinates?.length"
                             :id=newPoint.id
@@ -78,3 +78,9 @@ export default defineComponent({
     }
 });
 </script>
+
+<style scoped>
+.ymaps3--hint {
+    background: #0000005f !important;
+}
+</style>
