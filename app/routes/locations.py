@@ -127,11 +127,11 @@ async def update_location(
         location.name = name
     if coord_x is not None and coord_y is not None:
         location.coordinates = [coord_x, coord_y]
-    elif coord_x is not None or coord_y is not None:
-        raise HTTPException(
-            status_code=400,
-            detail="Необходимо передать обе координаты (coord_x и coord_y)"
-        )
+    # elif coord_x is not None or coord_y is not None:
+        # raise HTTPException(
+        #     status_code=400,
+        #     detail="Необходимо передать обе координаты (coord_x и coord_y)"
+        # )
     
     await db.commit()
     # Перезагружаем локацию с фото
