@@ -11,6 +11,7 @@
     </div>
 </div>
 <div class="flex flex-col mt-5 border-gray-50 bg-gray-50 border p-2 rounded-md w-full"
+     v-if="!isLoading"
      v-for="(image, index) in activeMarker?.photos"
      :key="index + 'img'">
     <img class="object-cover rounded-sm w-full mt-2 cursor-pointer hover:scale-101 transition duration-200 max-h-[500px]"
@@ -19,6 +20,7 @@
     <span class="text-sm underline text-red-600 hover:text-red-400 cursor-pointer"
           @click="$emit('deletePhoto', image.id)">Удалить</span>
 </div>
+<div v-else>Загрузка...</div>
 <FileLoader v-if="activeMarker?.coordinates"
             :coordinates="(activeMarker?.coordinates as LngLat)"
             :name="activeMarker?.name"
@@ -35,7 +37,6 @@ import SlotModal from './layout/SlotModal.vue';
 import type { IMapMarker } from '@/interfaces/IMapMarkers';
 import FileLoader from './common/FileLoader.vue';
 import type { LngLat } from '@yandex/ymaps3-types';
-import Api from '@/utils/Api';
 
 export default defineComponent({
     components: { SlotModal, FileLoader },
@@ -49,11 +50,21 @@ export default defineComponent({
         const activeImage = ref<string>();
         const visibleModal = ref(false);
         const pointName = ref(props.activeMarker?.name);
+        const isLoading = ref(false);
 
         watch((props), () => {
             if (props.activeMarker?.name) {
                 pointName.value = props.activeMarker?.name;
             }
+        }, { immediate: true, deep: true })
+
+        watch((props), () => {
+            if (props.activeMarker) {
+                isLoading.value = true;
+            }
+            setTimeout(() => {
+                isLoading.value = false;
+            }, 1000);
         }, { immediate: true, deep: true })
 
         const handleNameChange = () => {
@@ -64,6 +75,7 @@ export default defineComponent({
             activeImage,
             visibleModal,
             pointName,
+            isLoading,
             handleNameChange
         }
     }

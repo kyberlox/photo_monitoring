@@ -2,7 +2,7 @@
 <YandexMap v-model="map"
            :settings="{
             location: {
-                zoom: 7,
+                zoom: 10,
                 center: [46.792119, 51.899589]
             },
         }"
