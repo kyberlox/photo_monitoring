@@ -10,7 +10,7 @@ services:
       - "80:80"
       #- "443:443"
     environment:
-      - NGINX_HOST=${DOMAIN}
+      - DOMAIN=${DOMAIN}
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./uploads:/uploads
