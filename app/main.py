@@ -9,6 +9,9 @@ app = FastAPI(
     title="Virtual Map API",
     description="API для виртуальной карты с поддержкой фотографий по локациям",
     version="2.0.0",
+    docs_url="/api/docs", #None
+    openapi_url="/api/openapi.json"
+    )
 )
 
 # Настройка CORS
