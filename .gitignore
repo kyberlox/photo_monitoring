@@ -5,3 +5,5 @@
 /app/uploads
 
 **/__pycache__/
+
+/nginx/ssl/
