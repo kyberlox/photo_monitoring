@@ -7,10 +7,10 @@
          @click="$emit('markerClicked', point)">
         {{ point.name }}
     </div>
-    <div class="text-sm text-red-600 underline cursor-pointer hover:text-red-400 duration-200"
+    <!-- <div class="text-sm text-red-600 underline cursor-pointer hover:text-red-400 duration-200"
          @click="$emit('deletePoint', point.id)">
         Удалить
-    </div>
+    </div> -->
 </div>
 </template>
 <script lang='ts'>

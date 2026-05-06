@@ -17,8 +17,8 @@
     <img class="object-cover rounded-sm w-full mt-2 cursor-pointer hover:scale-101 transition duration-200 max-h-[500px]"
          :src="image.file_url"
          @click="{ activeImage = image.file_url; visibleModal = true }" />
-    <span class="text-sm underline text-red-600 hover:text-red-400 cursor-pointer"
-          @click="$emit('deletePhoto', image.id)">Удалить</span>
+    <!-- <span class="text-sm underline text-red-600 hover:text-red-400 cursor-pointer"
+          @click="$emit('deletePhoto', image.id)">Удалить</span> -->
 </div>
 <div v-else>Загрузка...</div>
 <FileLoader v-if="activeMarker?.coordinates"
