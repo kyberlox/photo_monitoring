@@ -8,9 +8,9 @@ services:
       #- frontend
     ports:
       - "80:80"
-      #- "443:443"
+      - "443:443"
     environment:
-      - NGINX_HOST=${DOMAIN}
+      - DOMAIN=${DOMAIN}
     volumes:
       - ./nginx/:/etc/nginx/conf.d/
       - ./uploads:/uploads
@@ -43,8 +43,8 @@ services:
     environment:
       - TZ=Europe/Saratov
     ports:
-      - "8000:8000"
-      #- "127.0.0.1:8000:8000"
+      # - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       - postgres
     networks:
